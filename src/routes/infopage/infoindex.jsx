@@ -51,9 +51,9 @@ export default function Infopage(props) {
     };
 
     return (
-        <>
+        <div className="big">
             <Row>
-                <Col className="arrowbase" flex={1}>
+                <Col className="arrowbase" flex={2}>
                     <input className="arrow" type="button" value="↑" onClick={handlePageUp} />
                     <br />
                     <input className="arrow" type="button" value="↓" onClick={handlePageDown} />
@@ -64,7 +64,7 @@ export default function Infopage(props) {
                     <input type="button" className="quit-btn" value="quit" onClick={props.onClick}></input>
 
                     <br />
-                    <input type="button" className="quit-btn" value="test" onClick={()=>{
+                    {/* <input type="button" className="quit-btn" value="test" onClick={()=>{
                                     //modify
                                     fetch(`http://localhost:8080/api/link/list?page_number=${127}&page_size=${5}`,{
                                         method:"GET",
@@ -75,9 +75,9 @@ export default function Infopage(props) {
                                         document.getElementById('deletemsg').innerText=data.msg//可能还要修改
                                     });
                                     //modified
-                                    }}></input>
+                                    }}></input> */}
                 </Col>
-                <Col  flex={4}>
+                <Col  flex={3}>
                     <List
                         itemLayout="horizontal"
                         dataSource={data}
@@ -107,6 +107,6 @@ export default function Infopage(props) {
                     />
                 </Col>
             </Row>
-        </>
+        </div>
     );
 }

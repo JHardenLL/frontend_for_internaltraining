@@ -102,7 +102,7 @@ class Shortlink extends React.Component{
                             <div className="caseinside">
                             <p>Link to shorten</p>
                             <input type="text" className="input-txt" id="linktoshort" onChange={this.getOrigin}></input>
-                            <p>Customize your short link(optional):</p>
+                            <p>Customize your short link:</p>
                             http://localhost:8080/<input type="text" id="diy" className="input-txt_" onChange={this.getShort}></input>
                             <p>optional comment</p>
                             <input type="text" className="input-txt" id="commit" onChange={this.getComment}></input>
@@ -169,28 +169,6 @@ class Shortlink extends React.Component{
                         </div>
                         </div>
 
-                        <div className="case">
-                        <div>
-                            input id to PAUSE certain short link:<br/>
-                            <input type="text" className="input-txt" id="pause"></input><br/>
-                            <input type="button" className="input-btn" value="pause" onClick={()=>{
-                                    this.state.myform = new FormData();
-                                    this.state.myform.append("id",document.getElementById('pause').value);
-                                    fetch("http://localhost:3000/url/pause",{
-                                        method:"POST",
-                                        headers:{"Authorization":"Bearer "+ this.props.responjwt},
-                                        body:this.state.myform
-                                    })
-                                    .then(response=>response.json())
-                                    .then(data=>{console.log(data);
-                                        document.getElementById('pausemsg').innerText=data.msg
-                                    });
-                                    }
-                                }>
-                            </input>
-                            <p id="pausemsg" style={{fontSize:20, color:'red'}}></p>
-                        </div>
-                        </div>
 
                         <div className="case">
                         <div>
@@ -222,10 +200,10 @@ class Shortlink extends React.Component{
                         <div className="case">
                         <div>
                             <br />
-                            <p>UPDATE certain shortlink for 24h</p>
+                            <p>UPDATE shortlinks for another 24h</p>
                             {/* <input type="text" className="input-txt" id="update" placeholder="please input the link ID"></input><br/> */}
                             <input type="text" className="input-txt" id="newshort" onChange={this.getShort3} placeholder="please input the shorted"></input><br/>
-                            <input type="text" className="input-txt"  onChange={this.getOrigin3} placeholder="please input the shorted"></input><br/>
+                            <input type="text" className="input-txt"  onChange={this.getOrigin3} placeholder="please input the origin"></input><br/>
                             <input type="text" className="input-txt" id="comment" onChange={this.getComment3} placeholder="whatever you want to say(optional)"></input><br/>                           
                             <input type="button" className="input-btn" value="update"onClick={()=>{
                                     var ret_ori="";
