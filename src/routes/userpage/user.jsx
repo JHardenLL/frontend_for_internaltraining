@@ -13,6 +13,7 @@ export default function User(props) {
     const [getedemail, setGemail] = useState("");
     const [getedname, setGname] = useState("");
 
+
     const fetchInfo = () => {
         fetch(`http://localhost:8080/api/user/info`, {
             method: "GET",
@@ -29,22 +30,91 @@ export default function User(props) {
     };
 
     const fetch_modify = () => {
-        fetch(`http://localhost:8080/api/user/info`, {
-            method: "POST",
-            credentials: 'include',
-            headers:{
-                'Content-Type': 'application/json',
-            },
-            body:JSON.stringify({
-                "id": id,
-                "name": getedname,
-                "email": email
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-        });
+        console.log("getedemail")
+        console.log(getedemail)
+        console.log("getedname")
+        console.log(getedname)
+        if(getedemail){
+            if(getedname){
+                console.log(1)
+                fetch(`http://localhost:8080/api/user/info`, {
+                    method: "POST",
+                    credentials: 'include',
+                    headers:{
+                        'Content-Type': 'application/json',
+                    },
+                    body:JSON.stringify({
+                        "id": id,
+                        "name": getedname,
+                        "email": getedemail
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                });
+            }
+            else{
+                console.log(2)
+                fetch(`http://localhost:8080/api/user/info`, {
+                    method: "POST",
+                    credentials: 'include',
+                    headers:{
+                        'Content-Type': 'application/json',
+                    },
+                    body:JSON.stringify({
+                        "id": id,
+                        "name": name,
+                        "email": getedemail
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                });
+            }
+        }
+        else{
+            if(getedname){
+                console.log(3)
+                fetch(`http://localhost:8080/api/user/info`, {
+                    method: "POST",
+                    credentials: 'include',
+                    headers:{
+                        'Content-Type': 'application/json',
+                    },
+                    body:JSON.stringify({
+                        "id": id,
+                        "name": getedname,
+                        "email": email
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                });
+            }
+            else{
+                console.log(4)
+                fetch(`http://localhost:8080/api/user/info`, {
+                    method: "POST",
+                    credentials: 'include',
+                    headers:{
+                        'Content-Type': 'application/json',
+                    },
+                    body:JSON.stringify({
+                        "id": id,
+                        "name": name,
+                        "email": email
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                });
+            }
+        }
+        
     };
 
     const getEmail=(event)=>{
@@ -136,11 +206,11 @@ export default function User(props) {
                         <input type="button" className="quit-btn" value="quit" onClick={props.onClick}></input>
                 </Col>
                 <Col  flex={4}>
-                    {/* <div>
+                    <div>
                         <a className="label">Email</a>
                         <input className="modify-input" onChange={getEmail}/>
                     </div>
-                    <br /> */}
+                    <br />
                     <br />
                     <div>
                         <a className="label">Name</a>

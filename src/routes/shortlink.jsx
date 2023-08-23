@@ -1,6 +1,7 @@
 import React from "react";
 import Infopage from "./infopage/infoindex";
 import User from "./userpage/user";
+import { DatePicker } from "antd";
 import '../style/shortlink.css'
 
 class Shortlink extends React.Component{
@@ -14,23 +15,100 @@ class Shortlink extends React.Component{
             getedshort:"",
             getedshort2:"",
             getedshort3:"",
+            getedshort4:"",
             getedcomment:"",
             getedcomment2:"",
             getedcomment3:"",
             myform:"",
             linkid:"",
             shorted:"",
+            isActive:"",
             deleteid:"",
             gotoinfo:0,
-            msg_create:""
+            msg_create:"",
+            formattedUTC1: "", 
+            formattedUTC2: "", 
+            updateTime1:"",
+            updateTime2:""
         }
     }
+
+    //modify
+
+    handleDateChange1 = (date, dateString) => {
+        this.setState({
+          formattedUTC1: dateString
+        });
+      };
+    
+    handleDateChange2 = (date, dateString) => {
+        this.setState({
+          formattedUTC2: dateString
+        });
+      };
+
+      handleDateUpdate1 = (date, dateString) => {
+        this.setState({
+          updateTime1: dateString
+        });
+      };
+    
+    handleDateUpdate2 = (date, dateString) => {
+        this.setState({
+            updateTime2: dateString
+        });
+      };
+
+    componentDidMount() {
+        // 添加全局键盘事件监听
+        window.addEventListener('keydown', this.handleKeyPress);
+    }
+
+    componentWillUnmount() {
+        // 移除全局键盘事件监听
+        window.removeEventListener('keydown', this.handleKeyPress);
+    }
+
+    redirectToLink = (short) => {
+        // 重定向到指定的短链接页面
+        fetch("http://localhost:8080/{short}",{
+            credentials: 'include',
+            method:"GET"
+        })
+        .then(response=>response.json())
+        .then(data=>{
+            console.log(data);
+            if(307===data.code)
+                window.location.href = `http://localhost:8080/${short}`;
+        });
+    }
+
+    handleKeyPress = (event) => {
+        // 捕获回车键事件
+        if (event.key === 'Enter') {
+            const { match } = this.props;
+            const { short } = match.params;
+
+            if (short) {
+                this.redirectToLink(short);
+            }
+        }
+    }
+    //modified
+    //这一段有问题，可能要问问
 
     getOrigin=(event)=>{
         this.setState({
             getedorigin:event.target.value
         })
     }
+
+    getOrigin3=(event)=>{
+        this.setState({
+            getedorigin3:event.target.value
+        })
+    }
+
 
     getShort=(event)=>{
         this.setState({
@@ -50,6 +128,12 @@ class Shortlink extends React.Component{
         })
     }
 
+    getShort4=(event)=>{
+        this.setState({
+            getedshort4:event.target.value
+        })
+    }
+
     getComment=(event)=>{
         this.setState({
             getedcomment:event.target.value
@@ -58,7 +142,7 @@ class Shortlink extends React.Component{
 
     getComment3=(event)=>{
         this.setState({
-            getedcomment:event.target.value
+            getedcomment3:event.target.value
         })
     }
 
@@ -98,7 +182,7 @@ class Shortlink extends React.Component{
                     <div className="contain">
                     {/* <ol> */}
                         {/* <li> */}
-                        <div className="case">
+                        <div className="case1">
                             <div className="caseinside">
                             <p>Link to shorten</p>
                             <input type="text" className="input-txt" id="linktoshort" onChange={this.getOrigin}></input>
@@ -107,15 +191,20 @@ class Shortlink extends React.Component{
                             <p>optional comment</p>
                             <input type="text" className="input-txt" id="commit" onChange={this.getComment}></input>
                             <br />
+                            <p>Select start time:</p>
+                            <DatePicker onChange={this.handleDateChange1} />
+                            <p>Select end time:</p>
+                            <DatePicker onChange={this.handleDateChange2} />
+                            <br />
                             <input type="button" className="input-btn" value="Shorten" onClick={()=>{
                                     //modify
-                                    const currentUTC = new Date();
-                                    const formattedUTC1 = this.getFormattedUTC(currentUTC);
-                                    console.log(formattedUTC1);
-                                    // 将获取到的 UTC 时间加上 24 小时
-                                    currentUTC.setUTCHours(currentUTC.getUTCHours() + 24);
-                                    const formattedUTC2 = this.getFormattedUTC(currentUTC);
-                                    console.log(formattedUTC2);
+                                    const { formattedUTC1, formattedUTC2 } = this.state;
+                                    console.log(formattedUTC1)
+                                    console.log(formattedUTC2)
+                                    const formattedTime1 = `${formattedUTC1}T00:00:00Z`;
+                                    const formattedTime2 = `${formattedUTC2}T23:59:59Z`;
+                                    console.log(formattedTime1)
+                                    console.log(formattedTime2)
 
                                     fetch("http://localhost:8080/api/link/create",{
                                         credentials: 'include',
@@ -127,8 +216,8 @@ class Shortlink extends React.Component{
                                             "short": this.state.getedshort,
                                             "origin": this.state.getedorigin,
                                             "comment": this.state.getedcomment,
-                                            "start_time": formattedUTC1,
-                                            "end_time": formattedUTC2
+                                            "start_time": `${this.state.formattedUTC1}T00:00:00Z`,
+                                            "end_time": `${this.state.formattedUTC2}T23:59:59Z`
                                         })
                                     })
                                     .then(response=>response.json())
@@ -158,11 +247,11 @@ class Shortlink extends React.Component{
                         </div>
                         {/* </li>
                         <li> */}
-                        <div className="case">
+                        <div className="case1">
                         <div>
                             <p>Generated Link</p><br />
-                            <p>ID:{this.state.linkid}</p><br/>
-                            <p>Generated Link:(valid for 24h)</p>
+                            {/* <p>ID:{this.state.linkid}</p><br/> */}
+                            <p>Your Short Link:</p>
                             <input type="text" className="input-txt" id="generated"></input>
                             <br />
                             <p id="shortenmsg" style={{fontSize:20, color:'red'}}>{this.state.msg_create}</p>
@@ -199,16 +288,85 @@ class Shortlink extends React.Component{
                         </div>
                         <div className="case">
                         <div>
+                            input id to PAUSE certain short link:<br/>
                             <br />
-                            <p>UPDATE shortlinks for another 24h</p>
+                            <p>
+                                If "active" is true , make it false; otherwise , make it true.
+                            </p>
+                            <br />
+                            <p>
+                                You can query its "active" in the "QUERY" block.
+                            </p>
+                            <input type="text" className="input-txt" id="pause" onChange={this.getShort4}></input><br/>
+                            <input type="button" className="input-btn" value="pause" onClick={()=>{
+                                fetch(`http://localhost:8080/api/link/info?short=${this.state.getedshort4}`,{
+                                    method:"GET",
+                                    credentials: 'include',
+                                })
+                                .then(response=>{
+                                    console.log("response");
+                                    console.log(response);
+                                    return response.json();
+                                })
+                                .then(
+                                    data=>{
+                                        console.log(data);
+                                        // ret_ori=data.data.origin;
+                                        // ret_com=data.data.comment;
+                                        // ret_act=data.data.active;
+                                        //modify
+                                
+
+                                
+                                fetch("http://localhost:8080/api/link/info",{                                       
+                                    method:"POST",
+                                    credentials: 'include', // 开启凭据支持
+                                    headers:{
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body:JSON.stringify({
+                                        "short": this.state.getedshort4,
+                                        "origin": data.data.origin,
+                                        "comment": data.data.comment,
+                                        "start_time": data.data.start_time,
+                                        "end_time": data.data.start_time,
+                                        "active": data.data.active?false:true
+                                    })
+                                })
+                                .then(response=>{
+                                    console.log("response")
+                                    console.log(response);
+                                    return response.json();
+                                    // return response
+                                })
+                                .then(data=>{
+                                    console.log("data");
+                                    console.log(data);
+                                    document.getElementById("pausemsg").innerText=data.msg
+                                });
+                                });    
+                                    }
+                                }>
+                            </input>
+                            <p id="pausemsg" style={{fontSize:20, color:'red'}}></p>
+                        </div>
+                        </div>
+                        <div className="case">
+                        <div>
+                            <br />
+                            <p>UPDATE shortlinks</p>
+                            <br />
+                            <p>Empty input of the original link or comment will not be modified by default</p>
                             {/* <input type="text" className="input-txt" id="update" placeholder="please input the link ID"></input><br/> */}
                             <input type="text" className="input-txt" id="newshort" onChange={this.getShort3} placeholder="please input the shorted"></input><br/>
                             <input type="text" className="input-txt"  onChange={this.getOrigin3} placeholder="please input the origin"></input><br/>
                             <input type="text" className="input-txt" id="comment" onChange={this.getComment3} placeholder="whatever you want to say(optional)"></input><br/>                           
+                            <p>Select start time:</p>
+                            <DatePicker onChange={this.handleDateUpdate1} />
+                            <p>Select end time:</p>
+                            <DatePicker onChange={this.handleDateUpdate2} />
+                            <br />
                             <input type="button" className="input-btn" value="update"onClick={()=>{
-                                    var ret_ori="";
-                                    var ret_com="";
-                                    var ret_act=0;
                                     fetch(`http://localhost:8080/api/link/info?short=${this.state.getedshort3}`,{
                                         method:"GET",
                                         credentials: 'include',
@@ -221,11 +379,10 @@ class Shortlink extends React.Component{
                                     .then(
                                         data=>{
                                             console.log(data);
-                                            ret_ori=data.data.origin;
-                                            ret_com=data.data.comment;
-                                            ret_act=data.data.active;
-                                    });
-                                    //modify
+                                            // ret_ori=data.data.origin;
+                                            // ret_com=data.data.comment;
+                                            // ret_act=data.data.active;
+                                            //modify
                                     const currentUTC = new Date();
                                     const formattedUTC1 = this.getFormattedUTC(currentUTC);
                                     console.log(formattedUTC1);
@@ -233,6 +390,8 @@ class Shortlink extends React.Component{
                                     currentUTC.setUTCHours(currentUTC.getUTCHours() + 24);
                                     const formattedUTC2 = this.getFormattedUTC(currentUTC);
                                     console.log(formattedUTC2);
+
+                                    
                                     fetch("http://localhost:8080/api/link/info",{                                       
                                         method:"POST",
                                         credentials: 'include', // 开启凭据支持
@@ -241,11 +400,11 @@ class Shortlink extends React.Component{
                                         },
                                         body:JSON.stringify({
                                             "short": this.state.getedshort3,
-                                            "origin": ret_ori,
-                                            "comment": ret_com,
-                                            "start_time": formattedUTC1,
-                                            "end_time": formattedUTC2,
-                                            "active":ret_act
+                                            "origin": this.state.getedorigin3?this.state.getedorigin3:data.data.origin,
+                                            "comment": this.state.getedcomment3?this.state.getedcomment3:data.data.comment,
+                                            "start_time": `${this.state.updateTime1}T00:00:00Z`,
+                                            "end_time": `${this.state.updateTime2}T23:59:59Z`,
+                                            "active":true
                                         })
                                     })
                                     .then(response=>{
@@ -258,7 +417,9 @@ class Shortlink extends React.Component{
                                         console.log("data");
                                         console.log(data);
                                     });
-                                    }
+                                    });
+                                    
+                                }
                                 }>
                             </input>
                         </div>
@@ -279,6 +440,16 @@ class Shortlink extends React.Component{
                                         document.getElementById("querymsg").innerText=data.msg
                                         document.getElementById("queryorigin").value=data.data.origin
                                         document.getElementById("queryshort").value=data.data.short
+                                        if(data.data.active){
+                                            this.setState({
+                                                isActive:"true"
+                                            })
+                                        }
+                                        else{
+                                            this.setState({
+                                                isActive:"false"
+                                            })
+                                        }
                                     });
                                     }
                                 }>
@@ -287,6 +458,8 @@ class Shortlink extends React.Component{
                             Link infomation
                             <input id="queryorigin" className="input-txt" placeholder="queried origin link"></input>
                             <input id="queryshort" className="input-txt" placeholder="queried short link"></input>
+                            <br />
+                            <p>active:{this.state.isActive}</p>
                         </div>
                         </div>
                     </div>
